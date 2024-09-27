@@ -46,6 +46,7 @@ struct ContentView: View {
     @State private var showingAddExpense = false
 
     @State private var selectedType = ["Business", "Personal"]
+    
 
     var body: some View {
         NavigationStack {
@@ -120,9 +121,7 @@ struct ContentView: View {
             .toolbar {
                 //add new item button
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddExpense = true
-                    }) {
+                    NavigationLink(destination: AddView(expenses: expenses)) {
                         Label("Add", systemImage: "plus")
                     }
                 }
@@ -132,9 +131,11 @@ struct ContentView: View {
                 }
             }
                                 
-            .sheet(isPresented: $showingAddExpense) {
-                AddView(expenses: expenses)
-            }
+//            .sheet(isPresented: $showingAddExpense) {
+//                AddView(expenses: expenses)
+//            }
+            
+
         }
     }
     

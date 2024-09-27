@@ -19,10 +19,10 @@ struct AddView: View {
             
     //variables
     var expenses: Expenses
-    
+        
     let types = ["Business", "Personal"]
     
-    let currencies = ["USD", "GBP", "CAD"]
+    let currencies = ["USD", "GBP", "JPY"]
     
     var body: some View {
         NavigationStack {
@@ -35,37 +35,36 @@ struct AddView: View {
                         Text($0)
                     }
                 }
-//                HStack {
-//                    Text("USD$").frame(width: 50, alignment: .leading)
                 HStack {
-                    Picker("Currency", selection: $currency) {
-                        ForEach(currencies, id: \.self) {
-                            Text($0)
-                        }
-                    }
                     TextField("Amount", value: $amount, format: .number .precision(.fractionLength(2)))
-                            .keyboardType(.decimalPad)
-                            .frame(alignment: .trailing)
+                        .keyboardType(.decimalPad)
+                    
+                        Picker("", selection: $currency) {
+                            ForEach(currencies, id: \.self) { currency in
+                                Text(currency)
+                            }
+                        }
+                        
+//                                                    TextField("Amount", value: $amount, format: .currency(code: "USD"))
+//                                                        .keyboardType(.decimalPad)
+                                                }
+
+
+
                 }
                 
-                //                TextField("Amount", value: $amount, format: .currency(code: "USD"))
-                //                    .keyboardType(.decimalPad)
-                //            }
-            }
-            
-            .navigationTitle("Add new expenses")
-            .toolbar {
-                //button sends the data inputted into the main view
-                Button("Save") {
-                    let item = ExpenseItem(name: name, type: type, amount: amount, currency: currency)
-                    expenses.items.append(item)
-                    dismiss()
+                .navigationTitle("Add new expenses")
+                .navigationBarBackButtonHidden()
+                .toolbar {
+                    //button sends the data inputted into the main view
+                    Button("Save") {
+                        let item = ExpenseItem(name: name, type: type, amount: amount, currency: currency)
+                        expenses.items.append(item)
+                        dismiss()
+                    }
                 }
             }
         }
-    }
-    
-
 }
 
 #Preview {
