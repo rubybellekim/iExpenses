@@ -39,29 +39,41 @@ struct AddView: View {
                     TextField("Amount", value: $amount, format: .number .precision(.fractionLength(2)))
                         .keyboardType(.decimalPad)
                     
-                        Picker("", selection: $currency) {
-                            ForEach(currencies, id: \.self) { currency in
-                                Text(currency)
-                            }
+                    Picker("", selection: $currency) {
+                        ForEach(currencies, id: \.self) { currency in
+                            Text(currency)
                         }
-                        
-//                                                    TextField("Amount", value: $amount, format: .currency(code: "USD"))
-//                                                        .keyboardType(.decimalPad)
-                                                }
-
-
-
+                    }
+                    
+                    // Edited part
+//                    TextField("Amount", value: $amount, format: .currency(code: "USD"))
+//                        .keyboardType(.decimalPad)
+//                }
+                    
+                    
+                    
                 }
+            }
                 
                 .navigationTitle("Add new expenses")
                 .navigationBarBackButtonHidden()
                 .toolbar {
-                    //button sends the data inputted into the main view
-                    Button("Save") {
-                        let item = ExpenseItem(name: name, type: type, amount: amount, currency: currency)
-                        expenses.items.append(item)
-                        dismiss()
+                    ToolbarItemGroup(placement: .confirmationAction) {
+                        //button sends the data inputted into the main view
+                        Button("Save") {
+                            let item = ExpenseItem(name: name, type: type, amount: amount, currency: currency)
+                            expenses.items.append(item)
+                            dismiss()
+                        }
                     }
+
+                    ToolbarItemGroup(placement: .cancellationAction) {
+                        Button("Cancel") {
+                            dismiss()
+                        }
+                        .foregroundColor(.red)
+                    }
+                    
                 }
             }
         }

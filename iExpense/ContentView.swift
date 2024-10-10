@@ -38,6 +38,74 @@ class Expenses: Codable {
     }
 }
 
+struct ItemList: View {
+    let item: ExpenseItem
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(item.name)
+                    .font(.headline)
+            }
+            
+            Spacer()
+            
+            Text(item.amount, format: .currency(code: item.currency))
+                .fontWeight(.semibold)
+                .foregroundColor(item.currency == "JPY" ? itemStyle2(item.amount) : itemStyle1(item.amount))
+        }
+    }
+    
+    //function: change the text colour by budget
+    func itemStyle1(_ amount: Double) -> Color {
+        switch amount {
+        case ..<30:
+            return Color.blue
+        case 30..<99:
+            return Color.green
+        default:
+            return Color.orange
+        }
+    }
+    
+    func itemStyle2(_ amount: Double) -> Color {
+        switch amount {
+        case ..<3000:
+            return Color.blue
+        case 3000..<10000:
+            return Color.green
+        default:
+            return Color.orange
+        }
+    }
+}
+
+
+struct ExpenseRange: View {
+    var body: some View {
+        HStack {
+            Circle()
+                .fill(.blue)
+                .frame(width: 15, height: 15)
+            Text("low")
+            
+            Spacer()
+            
+            Circle()
+                .fill(.green)
+                .frame(width: 15, height: 15)
+            Text("medium")
+            
+            Spacer()
+            
+            Circle()
+                .fill(.orange)
+                .frame(width: 15, height: 15)
+            Text("high")
+        }
+    }
+}
+
 struct ContentView: View {
     
     //state variables
@@ -55,38 +123,14 @@ struct ContentView: View {
                 Section(header: Text("Personal")) {
                     //filtering only 'personal' type expenses
                     ForEach(expenses.items.filter { $0.type == "Personal"} ) { item in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(item.name)
-                                    .font(.headline)
-                                
-                            }
-                            
-                            Spacer()
-                            
-                            Text(item.amount, format: .currency(code: item.currency))
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(itemStyle(item.amount))
+                        ItemList(item: item)
                     }
                     .onDelete(perform: removeItems)
-                    
                 }
                 Section(header: Text("Business")) {
                     //filtering only 'business' type expenses
                     ForEach(expenses.items.filter { $0.type == "Business"} ) { item in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(item.name)
-                                    .font(.headline)
-                            }
-                            
-                            Spacer()
-                            
-                            Text(item.amount, format: .currency(code: item.currency))
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(itemStyle(item.amount))
+                        ItemList(item: item)
                     }
                     .onDelete(perform: removeItems)
                 }
@@ -94,26 +138,7 @@ struct ContentView: View {
                 Section {
                    //footer section to inform coloured category by amount of budget
                 } footer: {
-                    HStack {
-                        Circle()
-                            .fill(.blue)
-                            .frame(width: 15, height: 15)
-                        Text("low")
-                        
-                        Spacer()
-                        
-                        Circle()
-                            .fill(.green)
-                            .frame(width: 15, height: 15)
-                        Text("medium")
-                        
-                        Spacer()
-                        
-                        Circle()
-                            .fill(.orange)
-                            .frame(width: 15, height: 15)
-                        Text("high")
-                    }
+                    ExpenseRange()
                 }
             }
             
@@ -131,6 +156,8 @@ struct ContentView: View {
                 }
             }
                                 
+            //** using .navigationLink instead of .sheet **
+            
 //            .sheet(isPresented: $showingAddExpense) {
 //                AddView(expenses: expenses)
 //            }
@@ -143,17 +170,7 @@ struct ContentView: View {
         expenses.items.remove(atOffsets: offsets)
     }
     
-    //function: change the text colour by budget
-    func itemStyle(_ amount: Double) -> Color {
-        switch amount {
-        case ..<10:
-            return Color.blue
-        case 10..<100:
-            return Color.green
-        default:
-            return Color.orange
-        }
-    }
+
 
 }
 
