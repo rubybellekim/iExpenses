@@ -9,20 +9,22 @@ import SwiftUI
 
 struct AddView: View {
     @Environment(\.dismiss) var dismiss
+    @Binding var selectedCurrencies: [String]
     
     //State variables
     @State private var name = ""
     @State private var type = "Personal"
     @State private var amount = 0.0
     @State private var isEditing = false
-    @State private var currency = "USD"
-            
+    @State private var currency = "CAD"
+    @State private var range = "Low 🔵"
+                
     //variables
     var expenses: Expenses
-        
-    let types = ["Business", "Personal"]
-    
-    let currencies = ["USD", "GBP", "JPY"]
+//    var selectedCurrencies: [String]
+            
+    let types = ["Personal", "Business"]
+    let ranges = ["Low 🔵", "Medium 🟢", "High 🟠"]
     
     var body: some View {
         NavigationStack {
@@ -40,17 +42,22 @@ struct AddView: View {
                         .keyboardType(.decimalPad)
                     
                     Picker("", selection: $currency) {
-                        ForEach(currencies, id: \.self) { currency in
+                        ForEach(selectedCurrencies, id: \.self) { currency in
                             Text(currency)
                         }
                     }
-                    
+                }
                     // Edited part
 //                    TextField("Amount", value: $amount, format: .currency(code: "USD"))
 //                        .keyboardType(.decimalPad)
 //                }
                     
-                    
+                Section {
+                    Picker("Gravity", selection: $range) {
+                                            ForEach(ranges, id: \.self) { range in
+                                                Text(range)
+                                            }
+                                        }
                     
                 }
             }
@@ -61,7 +68,7 @@ struct AddView: View {
                     ToolbarItemGroup(placement: .confirmationAction) {
                         //button sends the data inputted into the main view
                         Button("Save") {
-                            let item = ExpenseItem(name: name, type: type, amount: amount, currency: currency)
+                            let item = ExpenseItem(name: name, type: type, amount: amount, currency: currency, range: range)
                             expenses.items.append(item)
                             dismiss()
                         }
@@ -80,5 +87,5 @@ struct AddView: View {
 }
 
 #Preview {
-    AddView(expenses: Expenses())
+    AddView(selectedCurrencies: .constant(["CAD", "USD", "EUR"]), expenses: Expenses())
 }

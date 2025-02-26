@@ -14,6 +14,14 @@ struct ExpenseItem: Identifiable, Codable {
     let type: String
     let amount: Double
     let currency: String
+    let range: String
+}
+
+struct Settings {
+    var selectedCurrencies: [String] = ["USD", "CAD", "EUR", "JPY", "GBP"]
+    
+    let allCurrencies = ["CAD", "USD", "EUR", "GBP", "JPY", "KRW", "AUD", "CHF", "CNY", "HKD", "SGD", "MXN", "INR", "BRL"]
+
 }
 
 @Observable
@@ -40,7 +48,7 @@ class Expenses: Codable {
 
 struct ItemList: View {
     let item: ExpenseItem
-    
+
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -52,70 +60,47 @@ struct ItemList: View {
             
             Text(item.amount, format: .currency(code: item.currency))
                 .fontWeight(.semibold)
-                .foregroundColor(item.currency == "JPY" ? itemStyle2(item.amount) : itemStyle1(item.amount))
+                .foregroundColor(getColor(for: item.range))
         }
     }
     
-    //function: change the text colour by budget
-    func itemStyle1(_ amount: Double) -> Color {
-        switch amount {
-        case ..<30:
-            return Color.blue
-        case 30..<99:
-            return Color.green
-        default:
-            return Color.orange
-        }
-    }
-    
-    func itemStyle2(_ amount: Double) -> Color {
-        switch amount {
-        case ..<3000:
-            return Color.blue
-        case 3000..<10000:
-            return Color.green
-        default:
-            return Color.orange
+    private func getColor(for range: String) -> Color {
+        if range == "Low 🔵" {
+            return .blue
+        } else if range == "Medium 🟢" {
+            return .green
+        } else {
+            return .orange
         }
     }
 }
-
-
+    
 struct ExpenseRange: View {
     var body: some View {
         HStack {
-            Circle()
-                .fill(.blue)
-                .frame(width: 15, height: 15)
-            Text("low")
+            Text("🔵 low")
             
             Spacer()
             
-            Circle()
-                .fill(.green)
-                .frame(width: 15, height: 15)
-            Text("medium")
+            Text("🟢 medium")
             
             Spacer()
             
-            Circle()
-                .fill(.orange)
-                .frame(width: 15, height: 15)
-            Text("high")
+            Text("🟠 high")
         }
     }
 }
 
 struct ContentView: View {
-    
     //state variables
     @State private var expenses = Expenses()
+    @State private var settings = Settings()
     
     @State private var showingAddExpense = false
+    @State private var showingSettingSheet = false
 
     @State private var selectedType = ["Business", "Personal"]
     
-
     var body: some View {
         NavigationStack {
             //displaying all the saved expense datas
@@ -136,7 +121,7 @@ struct ContentView: View {
                 }
                 
                 Section {
-                   //footer section to inform coloured category by amount of budget
+                    //footer section to inform coloured category by amount of budget
                 } footer: {
                     ExpenseRange()
                 }
@@ -145,32 +130,43 @@ struct ContentView: View {
             .navigationTitle("iExpense")
             .toolbar {
                 //add new item button
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: AddView(expenses: expenses)) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: {
+                        showingAddExpense = true
+                    }) {
                         Label("Add", systemImage: "plus")
                     }
                 }
+                
+                //setting button
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: { showingSettingSheet.toggle() }) {
+                        Label("Custom Setting", systemImage: "gearshape")
+                    }
+                }
+                
                 //delete button
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     EditButton()
                 }
+
             }
-                                
+            
             //** using .navigationLink instead of .sheet **
             
-//            .sheet(isPresented: $showingAddExpense) {
-//                AddView(expenses: expenses)
-//            }
+            .navigationDestination(isPresented: $showingAddExpense) {
+                AddView(selectedCurrencies: $settings.selectedCurrencies, expenses: expenses)
+            }
             
-
+            .sheet(isPresented: $showingSettingSheet) {
+                SettingView(settings: $settings)
+            }
         }
     }
-    
-    func removeItems(at offsets: IndexSet) {
-        expenses.items.remove(atOffsets: offsets)
-    }
-    
-
+        
+        func removeItems(at offsets: IndexSet) {
+            expenses.items.remove(atOffsets: offsets)
+        }
 
 }
 
